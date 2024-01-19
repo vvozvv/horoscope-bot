@@ -1,0 +1,2 @@
+exports.PORT = 3000;
+exports.TOKEN = '6822743902:AAHd3ER05Ifmg5BK_vT5EKl3MFI7FhhaA4E';

@@ -1,0 +1,8 @@
+exports.SCENES = {
+  REGISTRATION: 'REGISTRATION',
+  VIEW_BOOKING: 'VIEW_BOOKING',
+  BOOKING: 'BOOKING',
+  CREATE_SEAT: 'CREATE_SEAT',
+};
+
+exports.ADMIN_IDS = ['avazhov'];

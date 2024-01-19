@@ -1,0 +1,22 @@
+version: '3.5'
+
+services:
+  mongodb:
+    image: mongo:6-jammy
+    ports:
+      - '27017:27017'
+    volumes:
+      - dbdata6:/data/db
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: telegram-bot
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongodb
+    volumes:
+      - ./src:/app/src
+volumes:
+  dbdata6:
