@@ -1,10 +1,11 @@
-const { Scenes, Markup } = require('telegraf');
-const { SCENES, ADMIN_IDS } = require('../constants/config');
-const { getYesNoMenu, getMainMenu } = require('../keyboards/main');
-const SeatController = require('../db/controllers/seat-controller');
-const UserController = require('../db/controllers/user-controller');
+import { Scenes, Markup } from 'telegraf';
+import { SCENES } from '../constants/config';
+import { getYesNoMenu, getMainMenu } from '../keyboards';
+import { seatCreate } from '../db/controllers/seat-controller';
+import { userGetList, userGetByTgLogin, userIsAdmin } from '../db/controllers/user-controller';
 
-const createSeat = new Scenes.WizardScene(
+// TODO: any нужно как-то убрать, пока варинтов не нашел
+const createSeat = new Scenes.WizardScene<any>(
   SCENES.CREATE_SEAT,
   async ctx => {
     await ctx.reply('Создание места. Введите номер места');
@@ -30,7 +31,7 @@ const createSeat = new Scenes.WizardScene(
     }
 
     if (text === 'Да') {
-      const users = await UserController.userGetList();
+      const users = await userGetList();
       ctx.wizard.state.contactData.users = users;
       ctx.wizard.state.contactData.available = true;
       await ctx.reply(
@@ -42,15 +43,15 @@ const createSeat = new Scenes.WizardScene(
   },
   async ctx => {
     const { seatNum, available } = ctx.wizard.state.contactData;
-    const currentUser = await UserController.userGetByTgLogin(
+    const currentUser = await userGetByTgLogin(
       ctx.update.message.chat.username,
     );
     const findedUser = ctx.wizard.state.contactData?.users?.find(
       i => i.fio === ctx.message.text,
     );
-    const isAdmin = ADMIN_IDS.includes(currentUser.tgLogin);
+    const isAdmin = currentUser ? userIsAdmin(currentUser?.tgLogin) : false;
 
-    const createdSeat = await SeatController.seatCreate(
+    const createdSeat = await seatCreate(
       seatNum,
       findedUser?._id,
       available,
@@ -69,4 +70,4 @@ const createSeat = new Scenes.WizardScene(
   },
 );
 
-module.exports = createSeat;
+export default createSeat;

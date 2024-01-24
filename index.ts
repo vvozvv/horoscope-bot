@@ -1,14 +1,14 @@
 const express = require('express');
-const { Telegraf, Scenes, session } = require('telegraf');
-const { getStartMenu } = require('./keyboards/main.js');
+import { Telegraf, Scenes, session, Context } from 'telegraf';
+import { getStartMenu } from './keyboards';
 const db = require('./db');
 const userRoutes = require('./routes/user-routes');
-const contactDataWizard = require('./scene/registrationScene');
-const viewSeatWizard = require('./scene/viewSeat');
-const { SCENES } = require('./constants/config');
-const createSeat = require('./scene/createSeatScene');
-const SeatController = require('./db/controllers/seat-controller');
-const createBooking = require('./scene/createBookingScene');
+import viewSeatWizard from './scene/viewSeat';
+import { SCENES } from './constants/config';
+import createSeat from './scene/createSeatScene';
+import contactDataWizard from './scene/registrationScene';
+import createBooking from './scene/createBookingScene';
+import { seatGetList } from './db/controllers/seat-controller';
 const { TOKEN, PORT } = require('./config');
 
 const app = express();
@@ -24,18 +24,14 @@ const stage = new Scenes.Stage([
 
 const bot = new Telegraf(TOKEN);
 bot.use(session());
-bot.use(stage.middleware());
+bot.use(stage.middleware() as any);
 
-bot.start(ctx => {
+bot.start((ctx: any) => {
   ctx.reply('Привет! Давай бронировать', getStartMenu());
 });
-// Вынести в константы название сцен
-bot.hears('Зарегистрироваться', Scenes.Stage.enter(SCENES.REGISTRATION));
-bot.hears('Забронировать место', Scenes.Stage.enter(SCENES.BOOKING));
-bot.hears('Посмотреть места', Scenes.Stage.enter(SCENES.VIEW_BOOKING));
-bot.hears('Добавить место', Scenes.Stage.enter(SCENES.CREATE_SEAT));
-bot.hears('Информация о местах', async ctx => {
-  const seats = await SeatController.seatGetList();
+
+bot.hears('Информация о местах', async (ctx: Context) => {
+  const seats = await seatGetList() as any[];
   let message = '';
 
   if (seats.length === 0) {
@@ -49,6 +45,10 @@ bot.hears('Информация о местах', async ctx => {
 
   return ctx.reply(message);
 });
+bot.hears('Посмотреть места', Scenes.Stage.enter<any>(SCENES.VIEW_BOOKING));
+bot.hears('Добавить место', Scenes.Stage.enter<any>(SCENES.CREATE_SEAT));
+bot.hears('Забронировать место', Scenes.Stage.enter<any>(SCENES.BOOKING));
+bot.hears('Зарегистрироваться', Scenes.Stage.enter<any>(SCENES.REGISTRATION));
 
 // Можно обрабатывать обычный текст
 bot.on('text', () => {});

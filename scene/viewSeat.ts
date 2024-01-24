@@ -1,17 +1,18 @@
-const { Scenes } = require('telegraf');
+import { Scenes } from 'telegraf';
 const path = require('path');
 const fs = require('fs');
-const { getDatesMenu, getMainMenu } = require('../keyboards/main');
-const { parseDate, formatDateToRu, daysOfWeek } = require('../helpers/date');
-const BookingController = require('../db/controllers/booking-controller');
-const SeatController = require('../db/controllers/seat-controller');
-const { excludeArr } = require('../helpers/array');
-const { userIsAdmin } = require('../db/controllers/user-controller');
-const { converterSvgToPng } = require('../helpers/converter');
-const { convertToSeats } = require('../helpers/object');
-const { SCENES } = require('../constants/config');
+import { getDatesMenu, getMainMenu } from '../keyboards';
+import { parseDate, formatDateToRu, daysOfWeek } from '../helpers/date';
+import {bookingGetByDate} from '../db/controllers/booking-controller';
+import { seatGetList, seatGetPermanentList } from '../db/controllers/seat-controller';
+import { excludeArr } from '../helpers/array';
+import { userIsAdmin } from '../db/controllers/user-controller';
+import { converterSvgToPng } from '../helpers/converter';
+import { convertToSeats } from '../helpers/object';
+import { SCENES } from '../constants/config';
 
-const viewSeat = new Scenes.WizardScene(
+// TODO: any нужно как-то убрать, пока варинтов не нашел
+const viewSeat = new Scenes.WizardScene<any>(
   SCENES.VIEW_BOOKING,
   async ctx => {
     await ctx.reply('Выберите дату', getDatesMenu());
@@ -26,17 +27,17 @@ const viewSeat = new Scenes.WizardScene(
     const date = ctx.message.text.split(' ')[0];
     let message = ``;
 
-    const seats = await SeatController.seatGetList();
+    const seats = await seatGetList();
     const withoutAvailable = seats.filter(i => !i.available).map(i => i.number);
-    const bookingInDay = await BookingController.bookingGetByDate(
+    const bookingInDay = await bookingGetByDate(
       parseDate(date),
-    );
-    const permanentSeats = await SeatController.seatGetPermanentList();
+    ) as any;
+    const permanentSeats = await seatGetPermanentList();
     const currentDataFileName = path.resolve(
       `assets/${parseDate(date).toISOString().split('T')[0]}.png`,
     );
 
-    const bookingIds = bookingInDay.map(i => i.reservedSeat?.number);
+    const bookingIds = bookingInDay.map(i => i.reservedSeat?.number) as any;
     const freeSeat = excludeArr(withoutAvailable, bookingIds);
 
     message += `${formatDateToRu(date)}, ${daysOfWeek[parseDate(date).getDay()]}\n\n`;
@@ -70,4 +71,4 @@ const viewSeat = new Scenes.WizardScene(
   },
 );
 
-module.exports = viewSeat;
+export default viewSeat;

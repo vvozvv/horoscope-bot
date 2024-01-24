@@ -1,11 +1,11 @@
-/**
- * @param {Array<number | string>} flexSeats
- * @param {Array<any>} bookingSeats
- */
-exports.convertToSeats = function (flexSeats, bookingSeats, permanentSeats) {
+export const convertToSeats = function (
+  flexSeats: Array<number | string>,
+  bookingSeats: Array<any>,
+  permanentSeats: any
+) {
   return {
     flex: flexSeats.reduce((acc, item) => {
-      acc[parseInt(item)] = '';
+      acc[Number(item)] = '';
       return acc;
     }, {}),
     booking: bookingSeats.reduce((acc, item) => {

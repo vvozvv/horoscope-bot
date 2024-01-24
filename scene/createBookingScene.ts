@@ -1,17 +1,17 @@
-const { Scenes, Markup } = require('telegraf');
-const { SCENES, ADMIN_IDS } = require('../constants/config');
-const {
+import { Scenes, Markup } from 'telegraf';
+import { SCENES } from '../constants/config';
+import {
   getDatesMenu,
   getYesNoMenu,
   getMainMenu,
-} = require('../keyboards/main');
-const BookingController = require('../db/controllers/booking-controller');
-const { parseDate } = require('../helpers/date');
-const SeatController = require('../db/controllers/seat-controller');
-const { splitArray, excludeArr } = require('../helpers/array');
-const UserController = require('../db/controllers/user-controller');
+} from '../keyboards';
+import { parseDate } from '../helpers/date';
+import { seatGetList } from '../db/controllers/seat-controller';
+import { bookingGetByDate, bookingCreate } from '../db/controllers/booking-controller';
+import { userGetByTgLogin, userIsAdmin } from '../db/controllers/user-controller';
+import { splitArray, excludeArr } from '../helpers/array';
 
-const createBooking = new Scenes.WizardScene(
+const createBooking = new Scenes.WizardScene<any>(
   SCENES.BOOKING,
   async ctx => {
     await ctx.reply('Выберите дату', getDatesMenu());
@@ -21,11 +21,11 @@ const createBooking = new Scenes.WizardScene(
   async ctx => {
     const date = ctx.message.text.split(' ')[0];
 
-    const seats = await SeatController.seatGetList();
+    const seats = await seatGetList();
     const withoutAvaliable = seats.filter(i => !i.available).map(i => i.number);
-    const bookingInDay = await BookingController.bookingGetByDate(
+    const bookingInDay = await bookingGetByDate(
       parseDate(date),
-    );
+    ) as any;
     ctx.wizard.state.contactData.day = date;
     ctx.wizard.state.contactData.date = parseDate(date);
     ctx.wizard.state.contactData.availablePlaces = seats.filter(
@@ -67,16 +67,16 @@ const createBooking = new Scenes.WizardScene(
     const text = ctx.message.text;
     const { availablePlaces, bookingNumber, day, date } =
       ctx.wizard.state.contactData;
-    const currentUser = await UserController.userGetByTgLogin(
+    const currentUser = await userGetByTgLogin(
       ctx.update.message.chat.username,
     );
-    const isAdmin = ADMIN_IDS.includes(currentUser.tgLogin);
+    const isAdmin = userIsAdmin(ctx.update.message.chat.username);
 
     if (text === 'Да') {
       const findedSeat = availablePlaces.find(
         i => i.number === Number(bookingNumber),
       );
-      await BookingController.bookingCreate(
+      await bookingCreate(
         findedSeat?._id,
         currentUser?._id,
         date,
@@ -96,4 +96,4 @@ const createBooking = new Scenes.WizardScene(
   },
 );
 
-module.exports = createBooking;
+export default createBooking;

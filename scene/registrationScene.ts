@@ -1,14 +1,15 @@
-const { Scenes } = require('telegraf');
-const UserController = require('../db/controllers/user-controller');
-const { getYesNoMenu, getMainMenu } = require('../keyboards/main');
-const { SCENES } = require('../constants/config');
+import { Scenes } from 'telegraf';
+import { userGetByTgLogin, userCreate } from '../db/controllers/user-controller';
+import { getYesNoMenu, getMainMenu } from '../keyboards';
+import { SCENES } from '../constants/config';
 
 const isFIO = /^[а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]+$/;
 
-const contactDataWizard = new Scenes.WizardScene(
+// TODO: any нужно как-то убрать, пока варинтов не нашел
+const contactDataWizard = new Scenes.WizardScene<any>(
   SCENES.REGISTRATION,
   async ctx => {
-    const currentUser = await UserController.userGetByTgLogin(
+    const currentUser = await userGetByTgLogin(
       ctx.update.message.chat.username,
     );
 
@@ -25,7 +26,6 @@ const contactDataWizard = new Scenes.WizardScene(
     }
   },
   async ctx => {
-    // validation example
     if (!isFIO.test(ctx.message.text)) {
       await ctx.reply(
         'Введеное ФИО не соответсвует маске. Пример: Иванов Иван Иванович',
@@ -48,7 +48,7 @@ const contactDataWizard = new Scenes.WizardScene(
     ctx.wizard.state.contactData.email = ctx.message.text;
 
     try {
-      const createdUser = await UserController.userCreate(
+      const createdUser = await userCreate(
         ctx.update.message.chat.username,
         ctx.wizard.state.contactData.fio,
       );
@@ -64,4 +64,4 @@ const contactDataWizard = new Scenes.WizardScene(
   },
 );
 
-module.exports = contactDataWizard;
+export default contactDataWizard;

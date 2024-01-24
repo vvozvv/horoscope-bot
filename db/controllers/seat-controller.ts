@@ -1,6 +1,6 @@
-const SeatSchema = require('../models/seat');
+import SeatSchema from '../models/seat';
 
-exports.seatCreate = function (number, userId = undefined, available = true) {
+export const seatCreate = function (number: number, userId = undefined, available = true) {
   const seat = new SeatSchema(
     {
       _id: undefined,
@@ -14,14 +14,14 @@ exports.seatCreate = function (number, userId = undefined, available = true) {
   return seat.save();
 };
 
-exports.seatGetList = function () {
+export const seatGetList = function () {
   return SeatSchema.find().populate({
     path: 'userId',
     select: 'fio',
-  });
+  }).exec();
 };
 
-exports.seatGetPermanentList = function () {
+export const seatGetPermanentList = function () {
   return SeatSchema.find({
     available: true,
   }).populate({

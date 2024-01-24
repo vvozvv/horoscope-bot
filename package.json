@@ -2,10 +2,10 @@
   "name": "psb-booking-bot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
+    "dev": "nodemon index.ts",
     "format": "prettier --write \"**/*.js\""
   },
   "author": "",
@@ -29,7 +29,7 @@
     "tsc": "^2.0.4"
   },
   "devDependencies": {
-    "@types/node": "^20.11.0",
+    "@types/node": "^20.11.6",
     "nodemon": "^3.0.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
