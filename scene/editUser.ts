@@ -7,7 +7,8 @@ import {
 import { SCENES } from '../constants/config';
 import { splitArray } from '../helpers/array';
 import { getMainMenu } from '../keyboards';
-import { seatGetList, seatUpdate } from '../db/controllers/seat-controller';
+import { seatUpdate } from '../db/controllers/seat-controller';
+import { getFreeSeatKeyboard } from '../keyboards/api.seat';
 
 // TODO: any нужно как-то убрать, пока варинтов не нашел
 const viewSeat = new Scenes.WizardScene<any>(
@@ -57,13 +58,10 @@ const viewSeat = new Scenes.WizardScene<any>(
     }
 
     if (operation === 'Добавить постоянное место') {
-      const seats = await seatGetList();
+      const { keyboard, seats } = await getFreeSeatKeyboard();
       ctx.wizard.state.contactData.seats = seats;
 
-      const keyBoard = Markup.keyboard(
-        splitArray(seats.filter(i => !i.available).map(i => String(i.number))),
-      ).resize();
-      await ctx.reply(`Выберите мето для бронированния`, keyBoard);
+      await ctx.reply(`Выберите мето для бронированния`, keyboard);
       return ctx.wizard.next();
     }
   },

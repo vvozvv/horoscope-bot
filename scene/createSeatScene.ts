@@ -6,6 +6,7 @@ import {
   userGetList,
   userGetByTgLogin,
   userIsAdmin,
+  userEditSeat,
 } from '../db/controllers/user-controller';
 
 // TODO: any нужно как-то убрать, пока варинтов не нашел
@@ -35,14 +36,20 @@ const createSeat = new Scenes.WizardScene<any>(
     }
 
     if (text === 'Да') {
-      const users = await userGetList();
-      ctx.wizard.state.contactData.users = users;
-      ctx.wizard.state.contactData.available = true;
-      await ctx.reply(
-        'Выберите пользователя',
-        Markup.keyboard(users.map(i => i.fio)).resize(),
-      );
-      return ctx.wizard.next();
+      const users = await userGetList(false);
+
+      if (users.length !== 0) {
+        ctx.wizard.state.contactData.users = users;
+        ctx.wizard.state.contactData.available = true;
+        await ctx.reply(
+          'Выберите пользователя',
+          Markup.keyboard(users.map(i => i.fio)).resize(),
+        );
+        return ctx.wizard.next();
+      } else {
+        await ctx.reply('Пользователей нет');
+        return ctx.wizard.next();
+      }
     }
   },
   async ctx => {
@@ -56,6 +63,10 @@ const createSeat = new Scenes.WizardScene<any>(
     const isAdmin = currentUser ? userIsAdmin(currentUser?.tgLogin) : false;
 
     const createdSeat = await seatCreate(seatNum, findedUser?._id, available);
+
+    if (available) {
+      await userEditSeat(ctx.update.message.chat.username, createdSeat?.id);
+    }
 
     if (createdSeat) {
       await ctx.reply(

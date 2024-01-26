@@ -2,9 +2,11 @@ import { Scenes } from 'telegraf';
 import {
   userGetByTgLogin,
   userCreate,
+  userIsAdmin,
 } from '../db/controllers/user-controller';
 import { getYesNoMenu, getMainMenu } from '../keyboards';
 import { SCENES } from '../constants/config';
+import { getFreeSeatKeyboard } from '../keyboards/api.seat';
 
 const isFIO = /^[а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]+$/;
 
@@ -41,9 +43,16 @@ const contactDataWizard = new Scenes.WizardScene<any>(
   },
   async ctx => {
     if (ctx.message.text === 'Да') {
-      await ctx.reply('Введите место');
-      // todo: добавить логику отображение мест для бронирования
-      return ctx.wizard.next();
+      const { keyboard, seats } = await getFreeSeatKeyboard();
+
+      if (seats.length === 0) {
+        await ctx.reply(`Мест для бронирования нет`);
+        return ctx.wizard.next();
+      } else {
+        ctx.wizard.state.contactData.seats = seats;
+        await ctx.reply(`Выберите место для бронированния`, keyboard);
+        return ctx.wizard.next();
+      }
     }
 
     return ctx.wizard.next();
@@ -52,13 +61,13 @@ const contactDataWizard = new Scenes.WizardScene<any>(
     ctx.wizard.state.contactData.email = ctx.message.text;
 
     try {
-      const createdUser = await userCreate(
+      await userCreate(
         ctx.update.message.chat.username,
         ctx.wizard.state.contactData.fio,
       );
       await ctx.reply(
         'Вы успешно зарегистрировались',
-        getMainMenu(createdUser.tgLogin === 'avazhov'),
+        getMainMenu(userIsAdmin(ctx.update.message.chat.username)),
       );
       return ctx.scene.leave();
     } catch (error) {

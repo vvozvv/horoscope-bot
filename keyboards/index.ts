@@ -5,7 +5,7 @@ import { splitArray } from '../helpers/array';
 export const getMainMenu = function (isAdmin = false) {
   const baseMenuButton = [
     ['Посмотреть места', 'Забронировать место'],
-    ['Информация о местах', 'Информация о пользователях']
+    ['Информация о местах', 'Информация о пользователях'],
   ];
 
   if (isAdmin) {

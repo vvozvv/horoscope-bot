@@ -15,8 +15,15 @@ export const userCreate = function (
   return user.save();
 };
 
-export const userGetList = function () {
-  return UserSchema.find().populate({ path: 'permanentBooking' }).exec();
+export const userGetList = function (exists?: boolean) {
+  const filter = {};
+  if (exists !== undefined) {
+    filter['permanentBooking'] = {
+      $exists: exists,
+    };
+  }
+
+  return UserSchema.find(filter).populate({ path: 'permanentBooking' }).exec();
 };
 
 export const userGetById = function (id: string | number) {

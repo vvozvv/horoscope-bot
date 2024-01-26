@@ -14,7 +14,7 @@ const userSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Seat',
       required: false,
-    }
+    },
   },
   { timestamps: true },
 );
