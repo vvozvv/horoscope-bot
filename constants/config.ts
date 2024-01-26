@@ -5,11 +5,12 @@ exports.SCENES = {
   CREATE_SEAT: 'CREATE_SEAT',
 };
 
-export const ADMIN_IDS = ['avazhov'];
+export const ADMIN_IDS = ['avazhov', 'purpleleech'];
 
 export enum SCENES {
   REGISTRATION = 'REGISTRATION',
   VIEW_BOOKING = 'VIEW_BOOKING',
   BOOKING = 'BOOKING',
   CREATE_SEAT = 'CREATE_SEAT',
+  EDIT_USER = 'EDIT_USER',
 }

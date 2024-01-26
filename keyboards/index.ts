@@ -1,12 +1,18 @@
 import { Markup } from 'telegraf';
-import { getWorkingDays, getNextWorkWeekDates } from '../helpers/date';
+import { getNextWorkWeekDates, getWorkingDays } from '../helpers/date';
 import { splitArray } from '../helpers/array';
 
 export const getMainMenu = function (isAdmin = false) {
-  return Markup.keyboard([
+  const baseMenuButton = [
     ['Посмотреть места', 'Забронировать место'],
-    ['Информация о местах'].concat(isAdmin ? ['Добавить место'] : []),
-  ]).resize();
+    ['Информация о местах', 'Информация о пользователях']
+  ];
+
+  if (isAdmin) {
+    baseMenuButton.push(['Добавить место', 'Редактирование пользователя']);
+  }
+
+  return Markup.keyboard(baseMenuButton).resize();
 };
 
 export const getDatesMenu = function () {
@@ -16,7 +22,7 @@ export const getDatesMenu = function () {
     currentWeekDates = [
       ...currentWeekDates,
       ...getNextWorkWeekDates(new Date()),
-      '↩ Назад',
+      // '↩ Назад',
     ];
   }
 

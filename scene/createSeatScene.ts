@@ -2,7 +2,11 @@ import { Scenes, Markup } from 'telegraf';
 import { SCENES } from '../constants/config';
 import { getYesNoMenu, getMainMenu } from '../keyboards';
 import { seatCreate } from '../db/controllers/seat-controller';
-import { userGetList, userGetByTgLogin, userIsAdmin } from '../db/controllers/user-controller';
+import {
+  userGetList,
+  userGetByTgLogin,
+  userIsAdmin,
+} from '../db/controllers/user-controller';
 
 // TODO: any нужно как-то убрать, пока варинтов не нашел
 const createSeat = new Scenes.WizardScene<any>(
@@ -51,11 +55,7 @@ const createSeat = new Scenes.WizardScene<any>(
     );
     const isAdmin = currentUser ? userIsAdmin(currentUser?.tgLogin) : false;
 
-    const createdSeat = await seatCreate(
-      seatNum,
-      findedUser?._id,
-      available,
-    );
+    const createdSeat = await seatCreate(seatNum, findedUser?._id, available);
 
     if (createdSeat) {
       await ctx.reply(

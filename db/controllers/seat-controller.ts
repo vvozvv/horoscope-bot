@@ -1,6 +1,10 @@
 import SeatSchema from '../models/seat';
 
-export const seatCreate = function (number: number, userId = undefined, available = true) {
+export const seatCreate = function (
+  number: number,
+  userId = undefined,
+  available = true,
+) {
   const seat = new SeatSchema(
     {
       _id: undefined,
@@ -15,10 +19,12 @@ export const seatCreate = function (number: number, userId = undefined, availabl
 };
 
 export const seatGetList = function () {
-  return SeatSchema.find().populate({
-    path: 'userId',
-    select: 'fio',
-  }).exec();
+  return SeatSchema.find()
+    .populate({
+      path: 'userId',
+      select: 'fio',
+    })
+    .exec();
 };
 
 export const seatGetPermanentList = function () {
@@ -28,4 +34,15 @@ export const seatGetPermanentList = function () {
     path: 'userId',
     select: 'fio',
   });
+};
+
+export const seatUpdate = function (
+  number: number,
+  userId: string | null,
+  available: boolean,
+) {
+  return SeatSchema.updateOne(
+    { number },
+    { $set: { userId, available } },
+  ).exec();
 };

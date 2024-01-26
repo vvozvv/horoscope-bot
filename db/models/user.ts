@@ -1,4 +1,4 @@
-import {Schema, model} from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 export interface UserModel {
   tgLogin: string;
@@ -12,9 +12,9 @@ const userSchema = new Schema(
     fio: String,
     permanentBooking: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Seat',
       required: false,
-    },
+    }
   },
   { timestamps: true },
 );

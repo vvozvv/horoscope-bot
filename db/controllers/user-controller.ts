@@ -1,7 +1,11 @@
 import UserSchema from '../models/user';
 import { ADMIN_IDS } from '../../constants/config';
 
-export const userCreate = function (tgLogin: string, fio: string, permanentBooking?: any) {
+export const userCreate = function (
+  tgLogin: string,
+  fio: string,
+  permanentBooking?: any,
+) {
   const user = new UserSchema({
     tgLogin: tgLogin,
     fio: fio,
@@ -12,7 +16,7 @@ export const userCreate = function (tgLogin: string, fio: string, permanentBooki
 };
 
 export const userGetList = function () {
-  return UserSchema.find().exec();
+  return UserSchema.find().populate({ path: 'permanentBooking' }).exec();
 };
 
 export const userGetById = function (id: string | number) {
@@ -23,6 +27,15 @@ export const userGetByTgLogin = function (username: string) {
   return UserSchema.findOne({
     tgLogin: username,
   }).exec();
+};
+
+export const userEditSeat = function (username: string, seat: string | null) {
+  return UserSchema.updateOne(
+    {
+      tgLogin: username,
+    },
+    { $set: { permanentBooking: seat } },
+  ).exec();
 };
 
 export const userIsAdmin = function (telegramLogin: string) {

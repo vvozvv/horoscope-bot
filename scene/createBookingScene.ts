@@ -1,14 +1,16 @@
 import { Scenes, Markup } from 'telegraf';
 import { SCENES } from '../constants/config';
-import {
-  getDatesMenu,
-  getYesNoMenu,
-  getMainMenu,
-} from '../keyboards';
+import { getDatesMenu, getYesNoMenu, getMainMenu } from '../keyboards';
 import { parseDate } from '../helpers/date';
 import { seatGetList } from '../db/controllers/seat-controller';
-import { bookingGetByDate, bookingCreate } from '../db/controllers/booking-controller';
-import { userGetByTgLogin, userIsAdmin } from '../db/controllers/user-controller';
+import {
+  bookingGetByDate,
+  bookingCreate,
+} from '../db/controllers/booking-controller';
+import {
+  userGetByTgLogin,
+  userIsAdmin,
+} from '../db/controllers/user-controller';
 import { splitArray, excludeArr } from '../helpers/array';
 
 const createBooking = new Scenes.WizardScene<any>(
@@ -23,9 +25,7 @@ const createBooking = new Scenes.WizardScene<any>(
 
     const seats = await seatGetList();
     const withoutAvaliable = seats.filter(i => !i.available).map(i => i.number);
-    const bookingInDay = await bookingGetByDate(
-      parseDate(date),
-    ) as any;
+    const bookingInDay = (await bookingGetByDate(parseDate(date))) as any;
     ctx.wizard.state.contactData.day = date;
     ctx.wizard.state.contactData.date = parseDate(date);
     ctx.wizard.state.contactData.availablePlaces = seats.filter(
@@ -76,11 +76,7 @@ const createBooking = new Scenes.WizardScene<any>(
       const findedSeat = availablePlaces.find(
         i => i.number === Number(bookingNumber),
       );
-      await bookingCreate(
-        findedSeat?._id,
-        currentUser?._id,
-        date,
-      );
+      await bookingCreate(findedSeat?._id, currentUser?._id, date);
       await ctx.reply(
         `✅ Место №${bookingNumber} забронированно на ${day}`,
         getMainMenu(isAdmin),

@@ -1,7 +1,7 @@
 export const convertToSeats = function (
   flexSeats: Array<number | string>,
   bookingSeats: Array<any>,
-  permanentSeats: any
+  permanentSeats: any,
 ) {
   return {
     flex: flexSeats.reduce((acc, item) => {
@@ -14,9 +14,10 @@ export const convertToSeats = function (
         `${fio[0]} ${fio[1][0]}.${fio[2][0]}\n`;
       return acc;
     }, {}),
-    permanent: permanentSeats.reduce((acc, item) => {
+    permanent: (permanentSeats ?? []).reduce((acc, item) => {
       const fio = item?.userId?.fio?.split(' ');
-      acc[parseInt(item.number)] = `${fio[0]} ${fio[1][0]}.${fio[2][0]}\n`;
+      acc[parseInt(item.number)] =
+        `${fio?.[0]} ${fio?.[1]?.[0]}.${fio?.[2]?.[0]}\n`;
       return acc;
     }, {}),
   };

@@ -11,9 +11,6 @@ const colorScheme = {
 
 /**
  * Конвертирование svg схемы мест в png с отображением мест.
- *
- * @param {Date} date
- * @param {} seat Схема мест: { flex: { [num]: FIO }, flex: { [num]: FIO } }
  */
 exports.converterSvgToPng = async function (date, seat, ctx) {
   const fileName = path.resolve(
@@ -27,7 +24,7 @@ exports.converterSvgToPng = async function (date, seat, ctx) {
   const $ = cheerio.load(svgContent);
 
   Object.entries(seat).forEach(([keyLabel, i]) => {
-    Object.entries(i).forEach(([key, value]) => {
+    Object.entries(i).forEach(([key, _]) => {
       $(`#${key}`).attr('fill', colorScheme[keyLabel]);
     });
   });

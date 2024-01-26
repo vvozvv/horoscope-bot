@@ -3,8 +3,11 @@ const path = require('path');
 const fs = require('fs');
 import { getDatesMenu, getMainMenu } from '../keyboards';
 import { parseDate, formatDateToRu, daysOfWeek } from '../helpers/date';
-import {bookingGetByDate} from '../db/controllers/booking-controller';
-import { seatGetList, seatGetPermanentList } from '../db/controllers/seat-controller';
+import { bookingGetByDate } from '../db/controllers/booking-controller';
+import {
+  seatGetList,
+  seatGetPermanentList,
+} from '../db/controllers/seat-controller';
 import { excludeArr } from '../helpers/array';
 import { userIsAdmin } from '../db/controllers/user-controller';
 import { converterSvgToPng } from '../helpers/converter';
@@ -29,9 +32,7 @@ const viewSeat = new Scenes.WizardScene<any>(
 
     const seats = await seatGetList();
     const withoutAvailable = seats.filter(i => !i.available).map(i => i.number);
-    const bookingInDay = await bookingGetByDate(
-      parseDate(date),
-    ) as any;
+    const bookingInDay = (await bookingGetByDate(parseDate(date))) as any;
     const permanentSeats = await seatGetPermanentList();
     const currentDataFileName = path.resolve(
       `assets/${parseDate(date).toISOString().split('T')[0]}.png`,
@@ -45,7 +46,7 @@ const viewSeat = new Scenes.WizardScene<any>(
     message += `🔴 Забронированные места:\n`;
     bookingInDay.forEach(i => {
       const fio = i?.userId?.fio?.split(' ');
-      message += `${i?.reservedSeat?.number} - ${fio[0]} ${fio[1][0]}.${fio[2][0]}\n`;
+      message += `${i?.reservedSeat?.number} - ${fio?.[0]} ${fio[1][0]}.${fio[2][0]}\n`;
     });
 
     message += `\n\n🟢 Свободные места: \n`;

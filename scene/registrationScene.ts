@@ -1,5 +1,8 @@
 import { Scenes } from 'telegraf';
-import { userGetByTgLogin, userCreate } from '../db/controllers/user-controller';
+import {
+  userGetByTgLogin,
+  userCreate,
+} from '../db/controllers/user-controller';
 import { getYesNoMenu, getMainMenu } from '../keyboards';
 import { SCENES } from '../constants/config';
 
@@ -39,6 +42,7 @@ const contactDataWizard = new Scenes.WizardScene<any>(
   async ctx => {
     if (ctx.message.text === 'Да') {
       await ctx.reply('Введите место');
+      // todo: добавить логику отображение мест для бронирования
       return ctx.wizard.next();
     }
 
