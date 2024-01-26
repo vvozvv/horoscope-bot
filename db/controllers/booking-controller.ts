@@ -1,5 +1,6 @@
 import BookingSchema from '../models/booking';
 import { Types } from 'mongoose';
+import { getDateInTwoWeeks } from '../../helpers/date';
 
 export const bookingCreate = function (
   reservedSeat: string,
@@ -27,6 +28,21 @@ export const bookingGetByDate = function (date: string | Date) {
     })
     .populate({
       path: 'userId',
+    })
+    .exec();
+};
+
+export const bookingGetMyBook = function () {
+  const futureDate = getDateInTwoWeeks();
+
+  return BookingSchema.find({
+    dateBooking: {
+      $gte: new Date(),
+      $lte: futureDate,
+    },
+  })
+    .populate({
+      path: 'reservedSeat',
     })
     .exec();
 };

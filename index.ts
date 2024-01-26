@@ -11,7 +11,13 @@ import createBooking from './scene/createBookingScene';
 import editUserScene from './scene/editUser';
 import { seatGetList } from './db/controllers/seat-controller';
 import { userGetList } from './db/controllers/user-controller';
+import { bookingGetMyBook } from './db/controllers/booking-controller';
 const { TOKEN, PORT } = require('./config');
+import {
+  getDateInTwoWeeks,
+  formatPrettyDate,
+  daysOfWeek,
+} from './helpers/date';
 
 const app = express();
 app.use(express.json());
@@ -58,6 +64,25 @@ bot.hears('Информация о пользователях', async (ctx: Cont
     users.forEach(i => {
       message += `${i.fio}\n`;
       message += `@${i.tgLogin} ${i.permanentBooking?.number ? '• 🔴' + i.permanentBooking?.number : ''}\n\n`;
+    });
+  }
+
+  return ctx.reply(message);
+});
+bot.hears('Посмотреть мою бронь', async (ctx: Context) => {
+  const booking = (await bookingGetMyBook()) as any[];
+  let message = '';
+
+  if (booking.length === 0) {
+    message = `На ближайшие 2 недели (До ${formatPrettyDate(getDateInTwoWeeks())}) брони нет`;
+  } else {
+    message += 'Ваша бронь:\n\n';
+    booking.forEach(i => {
+      if (i?.dateBooking) {
+        const currentDate = new Date(i?.dateBooking);
+        message += `🗓 ${formatPrettyDate(currentDate)} (${daysOfWeek[currentDate.getDay()]})\n`;
+        message += `Место: №${i?.reservedSeat?.number}\n\n`;
+      }
     });
   }
 

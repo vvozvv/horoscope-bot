@@ -14,21 +14,6 @@ exports.getNextWorkWeekDates = function (date) {
   const daysInWeek = 7;
   const currentDate = new Date(date.getTime());
 
-  // Проверка, является ли текущий день рабочим днем
-  const isWorkDay = currentDate => {
-    const day = currentDate.getDay();
-    return day !== 0 && day !== 6; // 0 - воскресенье, 6 - суббота
-  };
-
-  // Увеличение даты до следующего рабочего дня
-  const getNextWorkDay = currentDate => {
-    currentDate.setDate(currentDate.getDate() + 1);
-    while (!isWorkDay(currentDate)) {
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-    return currentDate;
-  };
-
   // Находим следующий рабочий понедельник
   while (currentDate.getDay() !== 1) {
     // 1 - понедельник
@@ -79,6 +64,11 @@ exports.formatDate = function (date, separator = '-') {
   return `${year}${separator}${month}${separator}${day}`;
 };
 
+exports.formatPrettyDate = function (date) {
+  const options = { day: 'numeric', month: 'long', year: 'numeric' };
+  return date.toLocaleDateString('ru-RU', options);
+}
+
 exports.formatDateToRu = function (dateString) {
   // Разбиваем строку на день и месяц
   const [day, month] = dateString.split('.');
@@ -120,3 +110,11 @@ exports.parseDate = function (dateString) {
 
   return new Date(year, month - 1, day, 12, 0);
 };
+
+/**
+ * Возвращает дату на 2 неделе старше от текущей
+ */
+exports.getDateInTwoWeeks = function () {
+  const currentDate = new Date();
+  return new Date(currentDate.getTime() + (14 * 24 * 60 * 60 * 1000));
+}
