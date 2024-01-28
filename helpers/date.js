@@ -118,3 +118,32 @@ exports.getDateInTwoWeeks = function () {
   const currentDate = new Date();
   return new Date(currentDate.getTime() + (14 * 24 * 60 * 60 * 1000));
 }
+
+
+/**
+ * Возвращает дату из строки типа: 1 февраля 2024 г.
+ */
+exports.getDateFromTheString = function (dateString) {
+  // todo: переделать
+  const months = {
+    "января": 0,
+    "февраля": 1,
+    "марта": 2,
+    "апреля": 3,
+    "мая": 4,
+    "июня": 5,
+    "июля": 6,
+    "августа": 7,
+    "сентября": 8,
+    "октября": 9,
+    "ноября": 10,
+    "декабря": 11
+  };
+  
+  const parts = dateString.split(' ');
+  const day = parseInt(parts[0]);
+  const month = months[parts[1]];
+  const year = parseInt(parts[2]);
+  
+  return new Date(year, month, day, 12, 0o0);
+}

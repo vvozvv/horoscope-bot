@@ -46,3 +46,7 @@ export const bookingGetMyBook = function () {
     })
     .exec();
 };
+
+export const bookingDeleteById = function (id: string) {
+  return BookingSchema.findByIdAndDelete(id).exec();
+};

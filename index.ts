@@ -3,12 +3,15 @@ import { Telegraf, Scenes, session, Context } from 'telegraf';
 import { getStartMenu } from './keyboards';
 const db = require('./db');
 const userRoutes = require('./routes/user-routes');
-import viewSeatWizard from './scene/viewSeat';
 import { SCENES } from './constants/config';
-import createSeat from './scene/createSeatScene';
-import contactDataWizard from './scene/registrationScene';
-import createBooking from './scene/createBookingScene';
-import editUserScene from './scene/editUser';
+import {
+  editUser,
+  createBookingScene,
+  createSeatScene,
+  deleteBookingScene,
+  registrationScene,
+  viewSeat,
+} from './scene';
 import { seatGetList } from './db/controllers/seat-controller';
 import { userGetList } from './db/controllers/user-controller';
 import { bookingGetMyBook } from './db/controllers/booking-controller';
@@ -24,11 +27,12 @@ app.use(express.json());
 app.use(userRoutes);
 
 const stage = new Scenes.Stage([
-  contactDataWizard,
-  viewSeatWizard,
-  createSeat,
-  createBooking,
-  editUserScene,
+  viewSeat,
+  createSeatScene,
+  createBookingScene,
+  editUser,
+  registrationScene,
+  deleteBookingScene,
 ]);
 
 const bot = new Telegraf(TOKEN);
@@ -96,11 +100,12 @@ bot.hears(
   'Редактирование пользователя',
   Scenes.Stage.enter<any>(SCENES.EDIT_USER),
 );
+bot.hears('Удалить бронь', Scenes.Stage.enter<any>(SCENES.DELETE_BOOKING));
 
 // Можно обрабатывать обычный текст
 bot.on('text', () => {});
 
-bot.launch();
+bot.launch().then(() => console.log('bot launch'));
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 app.listen(PORT, () => console.log(`My server is running on port ${PORT}`));
