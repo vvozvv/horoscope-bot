@@ -11,6 +11,7 @@ export const getMainMenu = function (isAdmin = false) {
 
   if (isAdmin) {
     baseMenuButton.push(['Добавить место', 'Редактирование пользователя']);
+    baseMenuButton.push(['Заявки в бота']);
   }
 
   return Markup.keyboard(baseMenuButton).resize();
@@ -23,7 +24,7 @@ export const getDatesMenu = function () {
     currentWeekDates = [
       ...currentWeekDates,
       ...getNextWorkWeekDates(new Date()),
-      // '↩ Назад',
+      '↩ Назад',
     ];
   }
 

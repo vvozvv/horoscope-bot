@@ -4,23 +4,29 @@ import { ADMIN_IDS } from '../../constants/config';
 export const userCreate = function (
   tgLogin: string,
   fio: string,
+  chatId: string,
   permanentBooking?: any,
 ) {
   const user = new UserSchema({
     tgLogin: tgLogin,
     fio: fio,
+    chatId,
     permanentBooking: permanentBooking ?? undefined,
   });
 
   return user.save();
 };
 
-export const userGetList = function (exists?: boolean) {
+export const userGetList = function (exists?: boolean, confirmed?: boolean) {
   const filter = {};
   if (exists !== undefined) {
     filter['permanentBooking'] = {
       $exists: exists,
     };
+  }
+
+  if (confirmed !== undefined) {
+    filter['confirmed'] = confirmed;
   }
 
   return UserSchema.find(filter).populate({ path: 'permanentBooking' }).exec();
@@ -36,12 +42,25 @@ export const userGetByTgLogin = function (username: string) {
   }).exec();
 };
 
-export const userEditSeat = function (username: string, seat: string | null) {
+export const userEditSeat = function (
+  username: string,
+  seat: string | undefined,
+  confirmed?: boolean | undefined,
+) {
+  const updateObject = {};
+  if (seat !== undefined) {
+    updateObject['seat'] = seat;
+  }
+
+  if (confirmed !== undefined) {
+    updateObject['confirmed'] = confirmed;
+  }
+
   return UserSchema.updateOne(
     {
       tgLogin: username,
     },
-    { $set: { permanentBooking: seat } },
+    updateObject,
   ).exec();
 };
 

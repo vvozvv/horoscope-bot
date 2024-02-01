@@ -28,18 +28,34 @@ const deleteBookingScene = new Scenes.WizardScene<any>(
         buttons.push(
           `${formatPrettyDate(currentDate)} (${daysOfWeek[currentDate.getDay()]}). Место: №${i?.reservedSeat?.number}`,
         );
+        buttons.push('↩ Назад');
       }
     });
 
-    await ctx.reply('Выберите дату для удаления брони. \nВы бронировали:');
-    await ctx.reply(message, Markup.keyboard(buttons).resize());
+    if (booking.length === 0) {
+      await ctx.reply(
+        `У вас ни одной брони`,
+        getMainMenu(userIsAdmin(ctx.update.message.chat.username)),
+      );
+      return ctx.scene.leave();
+    } else {
+      await ctx.reply('Выберите дату для удаления брони. \nВы бронировали:');
+      await ctx.reply(message, Markup.keyboard(buttons).resize());
 
-    ctx.wizard.state.contactData = { booking };
-    return ctx.wizard.next();
+      ctx.wizard.state.contactData = { booking };
+      return ctx.wizard.next();
+    }
   },
 
   async ctx => {
     const text = ctx.message.text;
+    if (text === '↩ Назад') {
+      await ctx.reply(
+        'Отмена бронирования места. ',
+        getMainMenu(userIsAdmin(ctx.update.message.chat.username)),
+      );
+      return ctx.scene.leave();
+    }
 
     ctx.wizard.state.contactData.selectDate = getDateFromTheString(
       text?.split('. ')[0],

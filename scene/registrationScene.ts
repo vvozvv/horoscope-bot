@@ -1,9 +1,5 @@
 import { Scenes } from 'telegraf';
-import {
-  userGetByTgLogin,
-  userCreate,
-  userIsAdmin,
-} from '../db/controllers/user-controller';
+import { userGetByTgLogin, userCreate } from '../db/controllers/user-controller';
 import { getYesNoMenu, getMainMenu } from '../keyboards';
 import { SCENES } from '../constants/config';
 import { getFreeSeatKeyboard } from '../keyboards/api.seat';
@@ -18,7 +14,7 @@ const contactDataWizard = new Scenes.WizardScene<any>(
       ctx.update.message.chat.username,
     );
 
-    if (currentUser) {
+    if (currentUser && currentUser.confirmed) {
       await ctx.reply(
         'Вы уже зарегистрированны',
         getMainMenu(currentUser.tgLogin === 'avazhov'),
@@ -50,7 +46,13 @@ const contactDataWizard = new Scenes.WizardScene<any>(
         return ctx.wizard.next();
       } else {
         ctx.wizard.state.contactData.seats = seats;
-        await ctx.reply(`Выберите место для бронированния`, keyboard);
+        await ctx.reply(`Выберите место для бронированния`, {
+          reply_markup: {
+            keyboard,
+            resize_keyboard: true,
+            one_time_keyboard: true,
+          },
+        });
         return ctx.wizard.next();
       }
     }
@@ -64,10 +66,14 @@ const contactDataWizard = new Scenes.WizardScene<any>(
       await userCreate(
         ctx.update.message.chat.username,
         ctx.wizard.state.contactData.fio,
+        ctx.chat.id,
       );
+      await ctx.reply('✅ Вы успешно зарегистрировались');
       await ctx.reply(
-        'Вы успешно зарегистрировались',
-        getMainMenu(userIsAdmin(ctx.update.message.chat.username)),
+        'Дождитесь предоставления доступа в боту. Вам придет сообщение',
+        {
+          reply_markup: { remove_keyboard: true },
+        },
       );
       return ctx.scene.leave();
     } catch (error) {

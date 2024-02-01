@@ -11,6 +11,7 @@ import {
   deleteBookingScene,
   registrationScene,
   viewSeat,
+  confirmedUser,
 } from './scene';
 import { seatGetList } from './db/controllers/seat-controller';
 import { userGetList } from './db/controllers/user-controller';
@@ -33,6 +34,7 @@ const stage = new Scenes.Stage([
   editUser,
   registrationScene,
   deleteBookingScene,
+  confirmedUser,
 ]);
 
 const bot = new Telegraf(TOKEN);
@@ -101,6 +103,7 @@ bot.hears(
   Scenes.Stage.enter<any>(SCENES.EDIT_USER),
 );
 bot.hears('Удалить бронь', Scenes.Stage.enter<any>(SCENES.DELETE_BOOKING));
+bot.hears('Заявки в бота', Scenes.Stage.enter<any>(SCENES.CONFIRMED_USER));
 
 // Можно обрабатывать обычный текст
 bot.on('text', () => {});

@@ -24,6 +24,10 @@ const viewSeat = new Scenes.WizardScene<any>(
   },
   async ctx => {
     if (ctx.message.text === '↩ Назад') {
+      await ctx.reply(
+        'Отмена просмотра мест. ',
+        getMainMenu(userIsAdmin(ctx.update.message.chat.username)),
+      );
       return ctx.scene.leave();
     }
 

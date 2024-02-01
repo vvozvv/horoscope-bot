@@ -34,10 +34,12 @@ export const bookingGetByDate = function (date: string | Date) {
 
 export const bookingGetMyBook = function () {
   const futureDate = getDateInTwoWeeks();
+  const date = new Date();
+  date.setHours(0);
 
   return BookingSchema.find({
     dateBooking: {
-      $gte: new Date(),
+      $gte: date,
       $lte: futureDate,
     },
   })

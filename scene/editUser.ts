@@ -39,6 +39,7 @@ const viewSeat = new Scenes.WizardScene<any>(
       findedUser?.permanentBooking
         ? 'Удалить постоянное место'
         : 'Добавить постоянное место',
+      '↩ Назад',
     ]).resize();
     await ctx.reply('Выберите действие', keyBoard);
     return ctx.wizard.next();
@@ -47,8 +48,16 @@ const viewSeat = new Scenes.WizardScene<any>(
     const operation = ctx.message.text;
     const { findedUser, isAdmin } = ctx.wizard.state.contactData;
 
+    if (ctx.message.text === '↩ Назад') {
+      await ctx.reply(
+        'Отмена редактирования пользователя. ',
+        getMainMenu(userIsAdmin(ctx.update.message.chat.username)),
+      );
+      return ctx.scene.leave();
+    }
+
     if (operation === 'Удалить постоянное место') {
-      await userEditSeat(ctx.update.message.chat.username, null);
+      await userEditSeat(ctx.update.message.chat.username, undefined);
       await seatUpdate(findedUser?.permanentBooking?.number, null, false);
       await ctx.reply(
         `Постоянно место у ${findedUser.fio} удалено`,

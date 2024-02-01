@@ -21,6 +21,13 @@ const createBooking = new Scenes.WizardScene<any>(
     return ctx.wizard.next();
   },
   async ctx => {
+    if (ctx.message.text === '↩ Назад') {
+      await ctx.reply(
+        'Отмена бронирования места. ',
+        getMainMenu(userIsAdmin(ctx.update.message.chat.username)),
+      );
+      return ctx.scene.leave();
+    }
     const date = ctx.message.text.split(' ')[0];
 
     const seats = await seatGetList();
