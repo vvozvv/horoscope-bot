@@ -12,6 +12,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: telegram-bot
+    restart: always
     ports:
       - '3000:3000'
     depends_on:

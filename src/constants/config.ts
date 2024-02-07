@@ -16,3 +16,6 @@ export enum SCENES {
   EDIT_USER = 'EDIT_USER',
   CONFIRMED_USER = 'CONFIRMED_USER',
 }
+
+export const PORT = 3000;
+export const TOKEN = '6822743902:AAHd3ER05Ifmg5BK_vT5EKl3MFI7FhhaA4E';

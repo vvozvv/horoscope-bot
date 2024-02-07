@@ -1,4 +1,4 @@
-const daysOfWeek = {
+export const daysOfWeek = {
   0: 'Воскресенье',
   1: 'Понедельник',
   2: 'Вторник',
@@ -8,9 +8,7 @@ const daysOfWeek = {
   6: 'Суббота',
 };
 
-exports.daysOfWeek = daysOfWeek;
-
-exports.getNextWorkWeekDates = function (date) {
+export const getNextWorkWeekDates = function (date) {
   const daysInWeek = 7;
   const currentDate = new Date(date.getTime());
 
@@ -20,7 +18,7 @@ exports.getNextWorkWeekDates = function (date) {
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
-  const nextWorkWeekDates = []; // Массив для хранения дат следующей рабочей недели
+  const nextWorkWeekDates: string[] = []; // Массив для хранения дат следующей рабочей недели
 
   // Добавляем даты следующей рабочей недели в массив
   for (let i = 0; i < daysInWeek; i++) {
@@ -36,9 +34,9 @@ exports.getNextWorkWeekDates = function (date) {
   return nextWorkWeekDates.splice(0, 5);
 };
 
-exports.getWorkingDays = function (currDate) {
+export const getWorkingDays = function (currDate): string[] {
   const currDayOfWeek = currDate.getDay();
-  const dates = [];
+  const dates: string[] = [];
 
   dates.push(`${currDate.getDate()}.${currDate.getMonth() + 1}`);
 
@@ -57,19 +55,19 @@ exports.getWorkingDays = function (currDate) {
   return dates;
 };
 
-exports.formatDate = function (date, separator = '-') {
+export const formatDate = function (date, separator = '-') {
   const [day, month] = date.split('.');
   const year = new Date().getFullYear();
 
   return `${year}${separator}${month}${separator}${day}`;
 };
 
-exports.formatPrettyDate = function (date) {
+export const formatPrettyDate = function (date) {
   const options = { day: 'numeric', month: 'long', year: 'numeric' };
   return date.toLocaleDateString('ru-RU', options);
 }
 
-exports.formatDateToRu = function (dateString) {
+export const formatDateToRu = function (dateString) {
   // Разбиваем строку на день и месяц
   const [day, month] = dateString.split('.');
 
@@ -101,7 +99,7 @@ exports.formatDateToRu = function (dateString) {
   return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 };
 
-exports.parseDate = function (dateString) {
+export const parseDate = function (dateString) {
   let parts = dateString.split('.');
   let day = parseInt(parts[0]);
   let month = parseInt(parts[1]);
@@ -114,7 +112,7 @@ exports.parseDate = function (dateString) {
 /**
  * Возвращает дату на 2 неделе старше от текущей
  */
-exports.getDateInTwoWeeks = function () {
+export const getDateInTwoWeeks = function () {
   const currentDate = new Date();
   return new Date(currentDate.getTime() + (14 * 24 * 60 * 60 * 1000));
 }
@@ -123,7 +121,7 @@ exports.getDateInTwoWeeks = function () {
 /**
  * Возвращает дату из строки типа: 1 февраля 2024 г.
  */
-exports.getDateFromTheString = function (dateString) {
+export const getDateFromTheString = function (dateString) {
   // todo: переделать
   const months = {
     "января": 0,
@@ -139,11 +137,11 @@ exports.getDateFromTheString = function (dateString) {
     "ноября": 10,
     "декабря": 11
   };
-  
+
   const parts = dateString.split(' ');
   const day = parseInt(parts[0]);
   const month = months[parts[1]];
   const year = parseInt(parts[2]);
-  
+
   return new Date(year, month, day, 12, 0o0);
 }

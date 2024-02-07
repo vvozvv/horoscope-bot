@@ -1,6 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const UserController = require('../db/controllers/user-controller');
+import { Router } from 'express';
+import { userCreate, userGetList } from '../db/controllers/user-controller'
+
+const router = Router();
 
 /**
  * @route POST api/user
@@ -13,7 +14,7 @@ router.post('/user', async (req, res) => {
     });
   }
 
-  const user = await UserController.userCreate(req.body.tgLogin, req.body.fio);
+  const user = await userCreate(req.body.tgLogin, req.body.fio, req.body.chatId);
 
   if (user) {
     return res.status(200).send(user);
@@ -23,7 +24,7 @@ router.post('/user', async (req, res) => {
 });
 
 router.get('/user', async (req, res) => {
-  const user = await UserController.userGetList();
+  const user = await userGetList();
 
   if (user) {
     return res.status(200).send(user);
@@ -32,4 +33,4 @@ router.get('/user', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

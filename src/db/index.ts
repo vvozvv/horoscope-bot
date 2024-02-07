@@ -8,4 +8,4 @@ mongoose
     console.error('Mongodb connection error', e.message);
   });
 
-module.exports = mongoose.connection;
+export default mongoose.connection;

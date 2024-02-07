@@ -1,6 +1,6 @@
 import { Scenes } from 'telegraf';
-const path = require('path');
-const fs = require('fs');
+import path from 'path';
+import fs from 'fs';
 import { getDatesMenu, getMainMenu } from '../keyboards';
 import { parseDate, formatDateToRu, daysOfWeek } from '../helpers/date';
 import { bookingGetByDate } from '../db/controllers/booking-controller';
@@ -38,7 +38,7 @@ const viewSeat = new Scenes.WizardScene<any>(
     const withoutAvailable = seats.filter(i => !i.available).map(i => i.number);
     const bookingInDay = (await bookingGetByDate(parseDate(date))) as any;
     const permanentSeats = await seatGetPermanentList();
-    const currentDataFileName = path.resolve(
+    const currentDataFileName = path.resolve?.(
       `assets/${parseDate(date).toISOString().split('T')[0]}.png`,
     );
 
@@ -58,7 +58,7 @@ const viewSeat = new Scenes.WizardScene<any>(
       message += `${i}, `;
     });
 
-    if (fs.existsSync(currentDataFileName)) {
+    if (currentDataFileName && fs.existsSync(currentDataFileName)) {
       await ctx.replyWithPhoto({ source: currentDataFileName });
     } else {
       await converterSvgToPng(

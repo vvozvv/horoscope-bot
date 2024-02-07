@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 import { Telegraf, Scenes, session, Context } from 'telegraf';
 import { getStartMenu } from './keyboards';
-const db = require('./db');
-const userRoutes = require('./routes/user-routes');
+import db from './db';
+import userRoutes from './routes/user-routes';
 import { SCENES } from './constants/config';
 import {
   editUser,
@@ -16,7 +16,7 @@ import {
 import { seatGetList } from './db/controllers/seat-controller';
 import { userGetList } from './db/controllers/user-controller';
 import { bookingGetMyBook } from './db/controllers/booking-controller';
-const { TOKEN, PORT } = require('./config');
+import { TOKEN, PORT } from './constants/config';
 import {
   getDateInTwoWeeks,
   formatPrettyDate,
