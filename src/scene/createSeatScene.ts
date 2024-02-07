@@ -56,7 +56,7 @@ const createSeat = new Scenes.WizardScene<any>(
     const { seatNum, available } = ctx.wizard.state.contactData;
     const currentUser = await userGetByTgLogin(
       ctx.update.message.chat.username,
-    );
+    ) as any;
     const findedUser = ctx.wizard.state.contactData?.users?.find(
       i => i.fio === ctx.message.text,
     );

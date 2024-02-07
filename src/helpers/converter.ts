@@ -1,13 +1,17 @@
 import path from 'path';
-import svg2img from 'svg2png';
 import fs from 'fs';
 import cheerio from 'cheerio';
+import { svg2png, initialize } from 'svg2png-wasm';
 
 const colorScheme = {
   free: '#7E52A0',
   booking: '#E86630',
   permanent: '#55BB99',
 };
+
+initialize(
+  fs.readFileSync('./node_modules/svg2png-wasm/svg2png_wasm_bg.wasm'),
+);
 
 /**
  * Конвертирование svg схемы мест в png с отображением мест.
@@ -35,11 +39,8 @@ export const converterSvgToPng = async function (date, seat: Record<string, any>
   }
 
   await fs.promises.writeFile(path.join(__dirname, 'BigData-1.svg'), $.html());
-  const file = await fs.readFileSync(path.join(__dirname, 'BigData-1.svg'));
 
-  const f = await svg2img(file);
-
-  console.log('file', f)
+  const f = await svg2png($.html());
 
   if (f) {
     await fs.writeFileSync(fileName, f);
