@@ -34,12 +34,6 @@ export const converterSvgToPng = async function (date, seat: Record<string, any>
     });
   });
 
-  if (fs.existsSync(path.join(__dirname, 'BigData-1.svg'))) {
-    fs.unlinkSync(path.join(__dirname, 'BigData-1.svg'));
-  }
-
-  await fs.promises.writeFile(path.join(__dirname, 'BigData-1.svg'), $.html());
-
   const f = await svg2png($.html());
 
   if (f) {

@@ -58,15 +58,11 @@ const viewSeat = new Scenes.WizardScene<any>(
       message += `${i}, `;
     });
 
-    if (currentDataFileName && fs.existsSync(currentDataFileName)) {
-      await ctx.replyWithPhoto({ source: currentDataFileName });
-    } else {
-      await converterSvgToPng(
-        parseDate(date),
-        convertToSeats(freeSeat, bookingInDay, permanentSeats),
-        ctx,
-      );
-    }
+    await converterSvgToPng(
+      parseDate(date),
+      convertToSeats(freeSeat, bookingInDay, permanentSeats),
+      ctx,
+    );
 
     await ctx.reply(
       message,
