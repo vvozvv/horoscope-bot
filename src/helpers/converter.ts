@@ -1,17 +1,13 @@
 import path from 'path';
 import fs from 'fs';
 import cheerio from 'cheerio';
-import { svg2png, initialize } from 'svg2png-wasm';
+import { convert } from 'convert-svg-to-webp';
 
 const colorScheme = {
   free: '#7E52A0',
   booking: '#E86630',
   permanent: '#55BB99',
 };
-
-initialize(
-  fs.readFileSync('./node_modules/svg2png-wasm/svg2png_wasm_bg.wasm'),
-);
 
 /**
  * Конвертирование svg схемы мест в png с отображением мест.
@@ -34,10 +30,9 @@ export const converterSvgToPng = async function (date, seat: Record<string, any>
     });
   });
 
-  const f = await svg2png($.html());
+  const webp = await convert($.html());
 
-  if (f) {
-    await fs.writeFileSync(fileName, f);
-    await ctx.replyWithPhoto({ source: fileName })
+  if (webp) {
+    await ctx.replyWithPhoto({ source: webp })
   }
 };
