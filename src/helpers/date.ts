@@ -65,7 +65,7 @@ export const formatDate = function (date, separator = '-') {
 export const formatPrettyDate = function (date) {
   const options = { day: 'numeric', month: 'long', year: 'numeric' };
   return date.toLocaleDateString('ru-RU', options);
-}
+};
 
 export const formatDateToRu = function (dateString) {
   // Разбиваем строку на день и месяц
@@ -114,9 +114,8 @@ export const parseDate = function (dateString) {
  */
 export const getDateInTwoWeeks = function () {
   const currentDate = new Date();
-  return new Date(currentDate.getTime() + (14 * 24 * 60 * 60 * 1000));
-}
-
+  return new Date(currentDate.getTime() + 14 * 24 * 60 * 60 * 1000);
+};
 
 /**
  * Возвращает дату из строки типа: 1 февраля 2024 г.
@@ -124,18 +123,18 @@ export const getDateInTwoWeeks = function () {
 export const getDateFromTheString = function (dateString) {
   // todo: переделать
   const months = {
-    "января": 0,
-    "февраля": 1,
-    "марта": 2,
-    "апреля": 3,
-    "мая": 4,
-    "июня": 5,
-    "июля": 6,
-    "августа": 7,
-    "сентября": 8,
-    "октября": 9,
-    "ноября": 10,
-    "декабря": 11
+    января: 0,
+    февраля: 1,
+    марта: 2,
+    апреля: 3,
+    мая: 4,
+    июня: 5,
+    июля: 6,
+    августа: 7,
+    сентября: 8,
+    октября: 9,
+    ноября: 10,
+    декабря: 11,
   };
 
   const parts = dateString.split(' ');
@@ -144,4 +143,11 @@ export const getDateFromTheString = function (dateString) {
   const year = parseInt(parts[2]);
 
   return new Date(year, month, day, 12, 0o0);
-}
+};
+
+export const isBirthday = (date: Date): boolean => {
+  const today = new Date();
+  return (
+    date.getDate() === today.getDate() && date.getMonth() === today.getMonth()
+  );
+};

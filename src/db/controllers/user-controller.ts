@@ -1,17 +1,18 @@
 import UserSchema from '../models/user';
 import { ADMIN_IDS } from '../../constants/config';
 
-
 export const userCreate = function (
   tgLogin: string,
   fio: string,
   chatId: string,
+  birthday: Date,
   permanentBooking?: any,
 ) {
   const user = new UserSchema({
     tgLogin: tgLogin,
     fio: fio,
     chatId,
+    birthday,
     permanentBooking: permanentBooking ?? undefined,
   });
 

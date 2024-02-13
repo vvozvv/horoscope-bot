@@ -22,7 +22,7 @@ export const seatGetList = function () {
   return SeatSchema.find()
     .populate({
       path: 'userId',
-      select: 'fio',
+      select: ['fio', 'birthday'],
     })
     .exec();
 };

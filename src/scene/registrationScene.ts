@@ -1,10 +1,16 @@
 import { Scenes } from 'telegraf';
-import { userGetByTgLogin, userCreate } from '../db/controllers/user-controller';
+import {
+  userGetByTgLogin,
+  userCreate,
+} from '../db/controllers/user-controller';
 import { getYesNoMenu, getMainMenu } from '../keyboards';
 import { SCENES } from '../constants/config';
 import { getFreeSeatKeyboard } from '../keyboards/api.seat';
+import { formatDate } from '../helpers/date';
 
 const isFIO = /^[а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]+ [а-яА-ЯёЁa-zA-Z]+$/;
+const isDate =
+  /^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/;
 
 // TODO: any нужно как-то убрать, пока варинтов не нашел
 const contactDataWizard = new Scenes.WizardScene<any>(
@@ -21,7 +27,9 @@ const contactDataWizard = new Scenes.WizardScene<any>(
       );
       return ctx.scene.leave();
     } else {
-      await ctx.reply('Введите ФИО. Пример: Иванов Иван Иванович');
+      await ctx.reply('Введите ФИО. Пример: Иванов Иван Иванович', {
+        reply_markup: { remove_keyboard: true },
+      });
       ctx.wizard.state.contactData = {};
       return ctx.wizard.next();
     }
@@ -34,6 +42,20 @@ const contactDataWizard = new Scenes.WizardScene<any>(
       return;
     }
     ctx.wizard.state.contactData.fio = ctx.message.text;
+    await ctx.reply(
+      'Введите дату рождения в формате DD.MM.YYYY. Пример: 24.03.1989',
+    );
+    return ctx.wizard.next();
+  },
+  async ctx => {
+    const date = ctx.message.text;
+
+    if (!isDate.test(date)) {
+      await ctx.reply('Дата не соответсвует маске. Пример: 24.03.1989');
+      return;
+    }
+
+    ctx.wizard.state.contactData.birthday = new Date(formatDate(date));
     await ctx.reply('У вас есть постояное место?', getYesNoMenu());
     return ctx.wizard.next();
   },
@@ -67,6 +89,7 @@ const contactDataWizard = new Scenes.WizardScene<any>(
         ctx.update.message.chat.username,
         ctx.wizard.state.contactData.fio,
         ctx.chat.id,
+        ctx.wizard.state.contactData.birthday,
       );
       await ctx.reply('✅ Вы успешно зарегистрировались');
       await ctx.reply(

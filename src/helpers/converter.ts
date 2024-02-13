@@ -12,7 +12,11 @@ const colorScheme = {
 /**
  * Конвертирование svg схемы мест в png с отображением мест.
  */
-export const converterSvgToPng = async function (date, seat: Record<string, any>, ctx) {
+export const converterSvgToPng = async function (
+  date,
+  seat: Record<string, any>,
+  ctx,
+) {
   const fileName = path.resolve(
     `src/assets/seats-archive/${new Date(date).toISOString().split('T')[0]}.png`,
   );
@@ -33,6 +37,6 @@ export const converterSvgToPng = async function (date, seat: Record<string, any>
   const webp = await convert($.html());
 
   if (webp) {
-    await ctx.replyWithPhoto({ source: webp })
+    await ctx.replyWithPhoto({ source: webp });
   }
 };

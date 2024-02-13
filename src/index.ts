@@ -21,6 +21,7 @@ import {
   getDateInTwoWeeks,
   formatPrettyDate,
   daysOfWeek,
+  isBirthday,
 } from './helpers/date';
 
 const app = express();
@@ -53,8 +54,14 @@ bot.hears('Информация о местах', async (ctx: Context) => {
     message = 'Места еще не добавили';
   } else {
     seats.forEach(i => {
+      console.log('i?.userId', i?.userId);
+      const isBirthdayDay =
+        i?.userId?.birthday && isBirthday(i.userId.birthday);
+
       message += `${i.userId ? '🔴' : '🟢'} Место: ${i.number}. Постоянное: ${i.available ? 'Да' : 'Нет'}\n`;
-      message += i.userId ? `Кем забронировано: ${i.userId.fio}\n\n` : '\n';
+      message += i.userId
+        ? `Кем забронировано: ${i.userId.fio} ${isBirthdayDay ? '🎂' : ''}\n\n`
+        : '\n';
     });
   }
 
@@ -68,7 +75,15 @@ bot.hears('Информация о пользователях', async (ctx: Cont
     message = 'Пользователей нет';
   } else {
     users.forEach(i => {
-      message += `${i.fio}\n`;
+      const isBirthdayDay = !!(i.birthday && isBirthday(i.birthday));
+
+      if (isBirthdayDay) {
+        message += `🎂 ${i.fio}\n`;
+        message += `${i.fio.split(' ')[1]} сегодня празднует день рождения!\n`;
+      } else {
+        message += `${i.fio}\n`;
+      }
+
       message += `@${i.tgLogin} ${i.permanentBooking?.number ? '• 🔴' + i.permanentBooking?.number : ''}\n\n`;
     });
   }

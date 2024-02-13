@@ -1,8 +1,11 @@
 import { Scenes } from 'telegraf';
-import path from 'path';
-import fs from 'fs';
 import { getDatesMenu, getMainMenu } from '../keyboards';
-import { parseDate, formatDateToRu, daysOfWeek } from '../helpers/date';
+import {
+  parseDate,
+  formatDateToRu,
+  daysOfWeek,
+  isBirthday,
+} from '../helpers/date';
 import { bookingGetByDate } from '../db/controllers/booking-controller';
 import {
   seatGetList,
@@ -38,19 +41,16 @@ const viewSeat = new Scenes.WizardScene<any>(
     const withoutAvailable = seats.filter(i => !i.available).map(i => i.number);
     const bookingInDay = (await bookingGetByDate(parseDate(date))) as any;
     const permanentSeats = await seatGetPermanentList();
-    const currentDataFileName = path.resolve?.(
-      `assets/${parseDate(date).toISOString().split('T')[0]}.png`,
-    );
-
     const bookingIds = bookingInDay.map(i => i.reservedSeat?.number) as any;
     const freeSeat = excludeArr(withoutAvailable, bookingIds);
 
     message += `${formatDateToRu(date)}, ${daysOfWeek[parseDate(date).getDay()]}\n\n`;
-
     message += `🔴 Забронированные места:\n`;
     bookingInDay.forEach(i => {
+      const isBirthdayDay = i.userId.birthday && isBirthday(i.userId.birthday);
+
       const fio = i?.userId?.fio?.split(' ');
-      message += `${i?.reservedSeat?.number} - ${fio?.[0]} ${fio[1][0]}.${fio[2][0]}\n`;
+      message += `${i?.reservedSeat?.number} - ${fio?.[0]} ${fio[1][0]}.${fio[2][0]} ${isBirthdayDay ? '🎂' : ''} \n`;
     });
 
     message += `\n\n🟢 Свободные места: \n`;

@@ -6,6 +6,7 @@ export interface UserModel {
   chatId: string;
   confirmed: string;
   permanentBooking?: any;
+  birthday?: Date;
   createdAt?: Date;
 }
 
@@ -19,6 +20,7 @@ const userSchema = new Schema(
       ref: 'Seat',
       required: false,
     },
+    birthday: Date,
     confirmed: {
       type: Boolean,
       default: false,

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { userCreate, userGetList } from '../db/controllers/user-controller'
+import { userCreate, userGetList } from '../db/controllers/user-controller';
 
 const router = Router();
 
@@ -14,7 +14,12 @@ router.post('/user', async (req, res) => {
     });
   }
 
-  const user = await userCreate(req.body.tgLogin, req.body.fio, req.body.chatId);
+  const user = await userCreate(
+    req.body.tgLogin,
+    req.body.fio,
+    req.body.birthday,
+    req.body.chatId,
+  );
 
   if (user) {
     return res.status(200).send(user);
