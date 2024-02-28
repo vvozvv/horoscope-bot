@@ -58,11 +58,11 @@ const viewSeat = new Scenes.WizardScene<any>(
       message += `${i}, `;
     });
 
-    await converterSvgToPng(
-      parseDate(date),
-      convertToSeats(freeSeat, bookingInDay, permanentSeats),
-      ctx,
-    );
+    // await converterSvgToPng(
+    //   parseDate(date),
+    //   convertToSeats(freeSeat, bookingInDay, permanentSeats),
+    //   ctx,
+    // );
 
     await ctx.reply(
       message,

@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 
 mongoose
-  // .connect('mongodb://127.0.0.1:27017/psb-booking-db')
+
   .connect(
-    'mongodb://gen_user:I(0l_d_%2Fhdr%24%255@147.45.107.117:27017/default_db?authSource=admin&directConnection=true',
+    'mongodb://mongodb:27017/psb-booking-db',
   )
   .then(() => console.info('Mongodb connected!'))
   .catch(e => {
