@@ -16,6 +16,7 @@ import { userIsAdmin } from '../db/controllers/user-controller';
 import { converterSvgToPng } from '../helpers/converter';
 import { convertToSeats } from '../helpers/object';
 import { SCENES } from '../constants/config';
+import path from 'path';
 
 // TODO: any нужно как-то убрать, пока варинтов не нашел
 const viewSeat = new Scenes.WizardScene<any>(
@@ -56,6 +57,10 @@ const viewSeat = new Scenes.WizardScene<any>(
     message += `\n\n🟢 Свободные места: \n`;
     freeSeat.forEach(i => {
       message += `${i}, `;
+    });
+
+    await ctx.replyWithPhoto({
+      source: path.resolve(`src/assets/seat-schema.jpg`),
     });
 
     // await converterSvgToPng(

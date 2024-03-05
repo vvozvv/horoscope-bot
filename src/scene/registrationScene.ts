@@ -1,4 +1,4 @@
-import { Scenes } from 'telegraf';
+import { Markup, Scenes } from 'telegraf';
 import {
   userGetByTgLogin,
   userCreate,
@@ -27,7 +27,7 @@ const contactDataWizard = new Scenes.WizardScene<any>(
       );
       return ctx.scene.leave();
     } else {
-      await ctx.reply('Введите ФИО. Пример: Иванов Иван Иванович', {
+      await ctx.reply('Введите ФИО.\nПример: Иванов Иван Иванович', {
         reply_markup: { remove_keyboard: true },
       });
       ctx.wizard.state.contactData = {};
@@ -37,13 +37,13 @@ const contactDataWizard = new Scenes.WizardScene<any>(
   async ctx => {
     if (!isFIO.test(ctx.message.text)) {
       await ctx.reply(
-        'Введеное ФИО не соответсвует маске. Пример: Иванов Иван Иванович',
+        'Введеное ФИО не соответсвует маске.\nПример: Иванов Иван Иванович',
       );
       return;
     }
     ctx.wizard.state.contactData.fio = ctx.message.text;
     await ctx.reply(
-      'Введите дату рождения в формате DD.MM.YYYY. Пример: 24.03.1989',
+      'Введите дату рождения в формате DD.MM.YYYY.\nПример: 24.03.1989',
     );
     return ctx.wizard.next();
   },
@@ -51,38 +51,9 @@ const contactDataWizard = new Scenes.WizardScene<any>(
     const date = ctx.message.text;
 
     if (!isDate.test(date)) {
-      await ctx.reply('Дата не соответсвует маске. Пример: 24.03.1989');
+      await ctx.reply('Дата не соответсвует маске\nПример: 24.03.1989');
       return;
     }
-
-    ctx.wizard.state.contactData.birthday = new Date(formatDate(date));
-    await ctx.reply('У вас есть постояное место?', getYesNoMenu());
-    return ctx.wizard.next();
-  },
-  async ctx => {
-    if (ctx.message.text === 'Да') {
-      const { keyboard, seats } = await getFreeSeatKeyboard();
-
-      if (seats.length === 0) {
-        await ctx.reply(`Мест для бронирования нет`);
-        return ctx.wizard.next();
-      } else {
-        ctx.wizard.state.contactData.seats = seats;
-        await ctx.reply(`Выберите место для бронированния`, {
-          reply_markup: {
-            keyboard,
-            resize_keyboard: true,
-            one_time_keyboard: true,
-          },
-        });
-        return ctx.wizard.next();
-      }
-    }
-
-    return ctx.wizard.next();
-  },
-  async ctx => {
-    ctx.wizard.state.contactData.email = ctx.message.text;
 
     try {
       await userCreate(

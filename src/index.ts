@@ -1,6 +1,11 @@
 import express from 'express';
-import { Telegraf, Scenes, session, Context } from 'telegraf';
-import { getStartMenu } from './keyboards';
+import { Telegraf, Scenes, session, Context, Markup } from 'telegraf';
+import {
+  getMainMenu,
+  getStartMenu,
+  privateMenu,
+  publicMenu,
+} from './keyboards';
 import db from './db';
 import userRoutes from './routes/user-routes';
 import { SCENES } from './constants/config';
@@ -14,7 +19,11 @@ import {
   confirmedUser,
 } from './scene';
 import { seatGetList } from './db/controllers/seat-controller';
-import { userGetList } from './db/controllers/user-controller';
+import {
+  userGetByTgLogin,
+  userGetList,
+  userIsAdmin,
+} from './db/controllers/user-controller';
 import { bookingGetMyBook } from './db/controllers/booking-controller';
 import { TOKEN, PORT } from './constants/config';
 import {
@@ -46,6 +55,25 @@ bot.start((ctx: any) => {
   ctx.reply('Привет! Давай бронировать', getStartMenu());
 });
 
+bot.use(async (ctx, next) => {
+  const text = (ctx.message as any).text;
+  const username = (ctx.message as any).chat.username;
+  const currentUser = (await userGetByTgLogin(username)) as any;
+  const isAdmin = currentUser ? userIsAdmin(currentUser?.tgLogin) : false;
+
+  if (publicMenu.includes(text) && !currentUser?.confirmed) {
+    await ctx.reply('Вы еще не зарегистрированы.', getStartMenu());
+    return;
+  }
+
+  if (privateMenu.includes(text) && !currentUser?.confirmed && !isAdmin) {
+    await ctx.reply('Вы не являетесь админом.', getMainMenu(isAdmin));
+    return;
+  }
+
+  await next();
+});
+
 bot.hears('Информация о местах', async (ctx: Context) => {
   const seats = (await seatGetList()) as any[];
   let message = '';
@@ -54,7 +82,6 @@ bot.hears('Информация о местах', async (ctx: Context) => {
     message = 'Места еще не добавили';
   } else {
     seats.forEach(i => {
-      console.log('i?.userId', i?.userId);
       const isBirthdayDay =
         i?.userId?.birthday && isBirthday(i.userId.birthday);
 
@@ -121,7 +148,10 @@ bot.hears('Удалить бронь', Scenes.Stage.enter<any>(SCENES.DELETE_BOO
 bot.hears('Заявки в бота', Scenes.Stage.enter<any>(SCENES.CONFIRMED_USER));
 
 // Можно обрабатывать обычный текст
-bot.on('text', () => {});
+bot.on('text', async ctx => {
+  const user = userIsAdmin((ctx.update.message.chat as any).username);
+  await ctx.reply('Выберите пункт меню.', getMainMenu(user));
+});
 
 bot.launch().then(() => console.log('bot launch'));
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));

@@ -2,6 +2,20 @@ import { Markup } from 'telegraf';
 import { getNextWorkWeekDates, getWorkingDays } from '../helpers/date';
 import { splitArray } from '../helpers/array';
 
+export const privateMenu = [
+  'Добавить место',
+  'Редактирование пользователя',
+  'Заявки в бота',
+];
+export const publicMenu = [
+  'Посмотреть места',
+  'Забронировать место',
+  'Информация о местах',
+  'Информация о пользователях',
+  'Посмотреть мою бронь',
+  'Удалить бронь',
+];
+
 export const getMainMenu = function (isAdmin = false) {
   const baseMenuButton = [
     ['Посмотреть места', 'Забронировать место'],

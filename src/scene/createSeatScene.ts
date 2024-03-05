@@ -15,7 +15,9 @@ const createSeat = new Scenes.WizardScene<any>(
   async ctx => {
     await ctx.reply('Создание места. Введите номер места');
     ctx.wizard.state.contactData = {};
-    return ctx.wizard.next();
+    return ctx.wizard.next({
+      reply_markup: { remove_keyboard: true },
+    });
   },
   async ctx => {
     if (!ctx.message.text) {
