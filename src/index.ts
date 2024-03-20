@@ -48,7 +48,7 @@ const sendMessage = async () => {
 
   await axios.post(`https://api.telegram.org/bot${process.env.TOKEN}/sendMessage`, {
     chat_id: '@polinahoro',
-    text: `${response.choices[0].message?.content}`
+    text: `${formattedDate}\n\n${response.choices[0].message?.content}`
   })
 
   return `${formattedDate}\n\n${response.choices[0].message?.content}`
