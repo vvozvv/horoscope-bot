@@ -66,6 +66,10 @@ cron.schedule('00 00 10 * * *', async () => {
 
 
 bot.start(async (ctx) => {
+  ctx.reply('Тебе сюда нельзя')
+});
+
+bot.hears('/post', async (ctx) => {
   const result = await sendMessage();
   ctx.reply(result)
 });
