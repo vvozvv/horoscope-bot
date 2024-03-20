@@ -4,6 +4,10 @@ import 'dotenv/config';
 import axios from 'axios';
 import { GigaChat } from 'gigachat-node';
 import cron  from 'node-cron'
+import path from 'path'
+
+process.env.NODE_EXTRA_CA_CERTS= path.resolve(__dirname, 'dir', 'with', 'certs')
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 const app = express();
 app.use(express.json());
