@@ -1,159 +1,71 @@
 import express from 'express';
-import { Telegraf, Scenes, session, Context, Markup } from 'telegraf';
-import {
-  getMainMenu,
-  getStartMenu,
-  privateMenu,
-  publicMenu,
-} from './keyboards';
-import db from './db';
-import userRoutes from './routes/user-routes';
-import { SCENES } from './constants/config';
-import {
-  editUser,
-  createBookingScene,
-  createSeatScene,
-  deleteBookingScene,
-  registrationScene,
-  viewSeat,
-  confirmedUser,
-} from './scene';
-import { seatGetList } from './db/controllers/seat-controller';
-import {
-  userGetByTgLogin,
-  userGetList,
-  userIsAdmin,
-} from './db/controllers/user-controller';
-import { bookingGetMyBook } from './db/controllers/booking-controller';
-import { TOKEN, PORT } from './constants/config';
-import {
-  getDateInTwoWeeks,
-  formatPrettyDate,
-  daysOfWeek,
-  isBirthday,
-} from './helpers/date';
+import { Telegraf, session } from 'telegraf';
+import 'dotenv/config';
+import axios from 'axios';
+import { GigaChat } from 'gigachat-node';
+import cron  from 'node-cron'
 
 const app = express();
 app.use(express.json());
-app.use(userRoutes);
 
-const stage = new Scenes.Stage([
-  viewSeat,
-  createSeatScene,
-  createBookingScene,
-  editUser,
-  registrationScene,
-  deleteBookingScene,
-  confirmedUser,
-]);
-
-const bot = new Telegraf(TOKEN);
-bot.use(session());
-bot.use(stage.middleware() as any);
-
-bot.start((ctx: any) => {
-  ctx.reply('Привет! Давай бронировать', getStartMenu());
-});
-
-bot.use(async (ctx, next) => {
-  const text = (ctx.message as any).text;
-  const username = (ctx.message as any).chat.username;
-  const currentUser = (await userGetByTgLogin(username)) as any;
-  const isAdmin = currentUser ? userIsAdmin(currentUser?.tgLogin) : false;
-
-  if (publicMenu.includes(text) && !currentUser?.confirmed) {
-    await ctx.reply('Вы еще не зарегистрированы.', getStartMenu());
-    return;
-  }
-
-  if (privateMenu.includes(text) && !currentUser?.confirmed && !isAdmin) {
-    await ctx.reply('Вы не являетесь админом.', getMainMenu(isAdmin));
-    return;
-  }
-
-  await next();
-});
-
-bot.hears('Информация о местах', async (ctx: Context) => {
-  const seats = (await seatGetList()) as any[];
-  let message = '';
-
-  if (seats.length === 0) {
-    message = 'Места еще не добавили';
-  } else {
-    seats.forEach(i => {
-      const isBirthdayDay =
-        i?.userId?.birthday && isBirthday(i.userId.birthday);
-
-      message += `${i.userId ? '🔴' : '🟢'} Место: ${i.number}. Постоянное: ${i.available ? 'Да' : 'Нет'}\n`;
-      message += i.userId
-        ? `Кем забронировано: ${i.userId.fio} ${isBirthdayDay ? '🎂' : ''}\n\n`
-        : '\n';
-    });
-  }
-
-  return ctx.reply(message);
-});
-bot.hears('Информация о пользователях', async (ctx: Context) => {
-  const users = await userGetList();
-  let message = '';
-
-  if (users.length === 0) {
-    message = 'Пользователей нет';
-  } else {
-    users.forEach(i => {
-      const isBirthdayDay = !!(i.birthday && isBirthday(i.birthday));
-
-      if (isBirthdayDay) {
-        message += `🎂 ${i.fio}\n`;
-        message += `${i.fio.split(' ')[1]} сегодня празднует день рождения!\n`;
-      } else {
-        message += `${i.fio}\n`;
-      }
-
-      message += `@${i.tgLogin} ${i.permanentBooking?.number ? '• 🔴' + i.permanentBooking?.number : ''}\n\n`;
-    });
-  }
-
-  return ctx.reply(message);
-});
-bot.hears('Посмотреть мою бронь', async (ctx: Context) => {
-  const booking = (await bookingGetMyBook()) as any[];
-  let message = '';
-
-  if (booking.length === 0) {
-    message = `На ближайшие 2 недели (До ${formatPrettyDate(getDateInTwoWeeks())}) брони нет`;
-  } else {
-    message += 'Ваша бронь:\n\n';
-    booking.forEach(i => {
-      if (i?.dateBooking) {
-        const currentDate = new Date(i?.dateBooking);
-        message += `🗓 ${formatPrettyDate(currentDate)} (${daysOfWeek[currentDate.getDay()]})\n`;
-        message += `Место: №${i?.reservedSeat?.number}\n\n`;
-      }
-    });
-  }
-
-  return ctx.reply(message);
-});
-bot.hears('Посмотреть места', Scenes.Stage.enter<any>(SCENES.VIEW_BOOKING));
-bot.hears('Добавить место', Scenes.Stage.enter<any>(SCENES.CREATE_SEAT));
-bot.hears('Забронировать место', Scenes.Stage.enter<any>(SCENES.BOOKING));
-bot.hears('Зарегистрироваться', Scenes.Stage.enter<any>(SCENES.REGISTRATION));
-bot.hears(
-  'Редактирование пользователя',
-  Scenes.Stage.enter<any>(SCENES.EDIT_USER),
+const client = new GigaChat(
+  'ODU1MjYyODEtZDI3Ni00YjI1LWE2MmMtYWEyMmMxZGU3NDBlOjBmNTU4Y2U0LTc4MjItNGNiYS04MjMyLWIyMWFkMmZmODFiNw==',
+  true,
+  true,
+  true
 );
-bot.hears('Удалить бронь', Scenes.Stage.enter<any>(SCENES.DELETE_BOOKING));
-bot.hears('Заявки в бота', Scenes.Stage.enter<any>(SCENES.CONFIRMED_USER));
 
-// Можно обрабатывать обычный текст
-bot.on('text', async ctx => {
-  const user = userIsAdmin((ctx.update.message.chat as any).username);
-  await ctx.reply('Выберите пункт меню.', getMainMenu(user));
+function randomNumber(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+const additionalTheme = ['любви', 'финансов', 'работы', 'удачи', 'счастья', 'успеха', 'денег']
+const additionalType = ['молодежном', 'строгом', 'игривом', 'счастливом', 'грустном']
+
+
+const bot = new Telegraf(process.env.TOKEN ?? '');
+bot.use(session());
+
+const sendMessage = async () => {
+  const date = new Date();
+  const options = { day: 'numeric', month: 'long' };
+  const formattedDate = date.toLocaleDateString('ru-RU', options as any);
+
+  await client.createToken();
+  const response = await client.completion({
+    "model":"GigaChat:latest",
+    "temperature": 2,
+    "messages": [
+      {
+        role:"user",
+        content: `
+          Напиши краткий гороскоп на одно предложение про совместимость Овна девушки и Козерога парня
+          в ${additionalType[randomNumber(1, additionalType.length + 1)]} стиле с использованием темы ${additionalTheme[randomNumber(1, additionalTheme.length + 1)]}
+        `,
+      }
+    ]
+  });
+
+  await axios.post(`https://api.telegram.org/bot${process.env.TOKEN}/sendMessage`, {
+    chat_id: '@polinahoro',
+    text: `${response.choices[0].message?.content}`
+  })
+
+  return `${formattedDate}\n\n${response.choices[0].message?.content}`
+}
+
+
+// Запуск задачи по расписанию
+cron.schedule('00 00 10 * * *', async () => {
+  await sendMessage();
+});
+
+
+bot.start(async (ctx) => {
+  const result = await sendMessage();
+  ctx.reply(result)
 });
 
 bot.launch().then(() => console.log('bot launch'));
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-app.listen(PORT, () => console.log(`My server is running on port ${PORT}`));
+app.listen(process.env.PORT, () => console.log(`My server is running on port ${process.env.PORT}`));

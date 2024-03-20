@@ -6,3 +6,5 @@
 
 /.idea
 /src/assets/seats-archive/
+
+*.env
