@@ -58,9 +58,38 @@ const sendMessage = async () => {
   return `${formattedDate}\n\n${response.choices[0].message?.content}`
 }
 
+const sendQuote = async () => {
+  await client.createToken();
+  const response = await client.completion({
+    "model":"GigaChat:latest",
+    "temperature": 2,
+    "messages": [
+      {
+        role:"user",
+        content: `Приведи одну цитату на тему ${additionalType[randomNumber(1, additionalType.length + 1)]} одного из этих авторов -
+          Федор Достоевский, АЛЬБЕРТ ЭЙНШТЕЙН, ОСКАР УАЙЛЬД, ДЖОРДЖ БЕРНАРД ШОУ, ГАБРИЕЛЬ (КОКО) ШАНЕЛЬ,
+          МАРК ТВЕН, Виктор Мари Гюго, Фридрих Ницше, Лев Толстой, Эрих Мария Ремарк
+        `,
+      }
+    ]
+  });
+
+  await axios.post(`https://api.telegram.org/bot${process.env.TOKEN}/sendMessage`, {
+    chat_id: '@polinahoro',
+    text: `#ЭтоЗнак\n\n${response.choices[0].message?.content}`
+  })
+
+  return `#ЭтоЗнак\n\n${response.choices[0].message?.content}`
+}
+
 
 // Запуск задачи по расписанию
 cron.schedule('00 00 10 * * *', async () => {
+  await sendMessage();
+});
+
+// Запуск задачи по расписанию
+cron.schedule('00 00 18 * * *', async () => {
   await sendMessage();
 });
 
@@ -71,6 +100,11 @@ bot.start(async (ctx) => {
 
 bot.hears('/post', async (ctx) => {
   const result = await sendMessage();
+  ctx.reply(result)
+});
+
+bot.hears('/quote', async (ctx) => {
+  const result = await sendQuote();
   ctx.reply(result)
 });
 
