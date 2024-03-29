@@ -90,7 +90,7 @@ cron.schedule('00 00 10 * * *', async () => {
 
 // Запуск задачи по расписанию
 cron.schedule('00 00 18 * * *', async () => {
-  await sendMessage();
+  await sendQuote();
 });
 
 
