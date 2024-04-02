@@ -107,7 +107,7 @@ function getRemainingTime(currentDate, endDate) {
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 
-  return `Осталось ${days} ${declOfNum(days, ['день', 'дня', 'дней'])} и ${hours} ${declOfNum(hours, ['час', 'часа', 'часов'])}`;
+  return `До встречи осталось: ${days} ${declOfNum(days, ['день', 'дня', 'дней'])} и ${hours} ${declOfNum(hours, ['час', 'часа', 'часов'])}`;
 }
 
 
