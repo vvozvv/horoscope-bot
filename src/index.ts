@@ -5,6 +5,7 @@ import axios from 'axios';
 import { GigaChat } from 'gigachat-node';
 import cron  from 'node-cron'
 import path from 'path'
+import dayjs from 'dayjs';
 
 process.env.NODE_EXTRA_CA_CERTS= path.resolve(__dirname, 'dir', 'with', 'certs')
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
@@ -82,6 +83,33 @@ const sendQuote = async () => {
   return `#ЭтоЗнак\n\n${response.choices[0].message?.content}`
 }
 
+const sendDate = async () => {
+  const date = getRemainingTime(new Date(), '2024-04-12 06:00');
+  await axios.post(`https://api.telegram.org/bot${process.env.TOKEN}/sendMessage`, {
+    chat_id: '@polinahoro',
+    text: `${date}`
+  })
+
+  return date;
+}
+
+function declOfNum(n, text_forms) {
+  n = Math.abs(n) % 100;
+  var n1 = n % 10;
+  if (n > 10 && n < 20) { return text_forms[2]; }
+  if (n1 > 1 && n1 < 5) { return text_forms[1]; }
+  if (n1 == 1) { return text_forms[0]; }
+  return text_forms[2];
+}
+
+function getRemainingTime(currentDate, endDate) {
+  const diff = dayjs(endDate).diff(dayjs(currentDate));
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+  return `Осталось ${days} ${declOfNum(days, ['день', 'дня', 'дней'])} и ${hours} ${declOfNum(hours, ['час', 'часа', 'часов'])}`;
+}
+
 
 // Запуск задачи по расписанию
 cron.schedule('00 00 10 * * *', async () => {
@@ -93,6 +121,11 @@ cron.schedule('00 00 18 * * *', async () => {
   await sendQuote();
 });
 
+// Запуск задачи по расписанию
+cron.schedule('00 45 21 * * *', async () => {
+  await sendDate();
+});
+
 
 bot.start(async (ctx) => {
   ctx.reply('Тебе сюда нельзя')
@@ -100,6 +133,11 @@ bot.start(async (ctx) => {
 
 bot.hears('/post', async (ctx) => {
   const result = await sendMessage();
+  ctx.reply(result)
+});
+
+bot.hears('/date', async (ctx) => {
+  const result = await sendDate();
   ctx.reply(result)
 });
 
