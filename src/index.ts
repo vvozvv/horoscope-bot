@@ -112,17 +112,21 @@ function getRemainingTime(currentDate, endDate) {
 
 
 // Запуск задачи по расписанию
-cron.schedule('00 00 10 * * *', async () => {
-  await sendMessage();
-});
-
-// Запуск задачи по расписанию
-cron.schedule('00 00 18 * * *', async () => {
-  await sendQuote();
-});
+// cron.schedule('00 00 10 * * *', async () => {
+//   await sendMessage();
+// });
+//
+// // Запуск задачи по расписанию
+// cron.schedule('00 00 18 * * *', async () => {
+//   await sendQuote();
+// });
 
 // Запуск задачи по расписанию
 cron.schedule('00 45 21 * * *', async () => {
+  await sendDate();
+});
+
+cron.schedule('00 00 10 * * *', async () => {
   await sendDate();
 });
 
