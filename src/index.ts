@@ -83,15 +83,15 @@ const sendQuote = async () => {
   return `#ЭтоЗнак\n\n${response.choices[0].message?.content}`
 }
 
-const sendDate = async () => {
-  const date = getRemainingTime(new Date(), '2024-04-12 06:00');
-  await axios.post(`https://api.telegram.org/bot${process.env.TOKEN}/sendMessage`, {
-    chat_id: '@polinahoro',
-    text: `${date}`
-  })
-
-  return date;
-}
+// const sendDate = async () => {
+//   const date = getRemainingTime(new Date(), '2024-04-12 06:00');
+//   await axios.post(`https://api.telegram.org/bot${process.env.TOKEN}/sendMessage`, {
+//     chat_id: '@polinahoro',
+//     text: `${date}`
+//   })
+//
+//   return date;
+// }
 
 function declOfNum(n, text_forms) {
   n = Math.abs(n) % 100;
@@ -121,15 +121,6 @@ function getRemainingTime(currentDate, endDate) {
 //   await sendQuote();
 // });
 
-// Запуск задачи по расписанию
-cron.schedule('00 45 21 * * *', async () => {
-  await sendDate();
-});
-
-cron.schedule('00 00 10 * * *', async () => {
-  await sendDate();
-});
-
 
 bot.start(async (ctx) => {
   ctx.reply('Тебе сюда нельзя')
@@ -140,10 +131,10 @@ bot.hears('/post', async (ctx) => {
   ctx.reply(result)
 });
 
-bot.hears('/date', async (ctx) => {
-  const result = await sendDate();
-  ctx.reply(result)
-});
+// bot.hears('/date', async (ctx) => {
+//   const result = await sendDate();
+//   ctx.reply(result)
+// });
 
 bot.hears('/quote', async (ctx) => {
   const result = await sendQuote();
